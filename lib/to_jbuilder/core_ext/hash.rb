@@ -9,12 +9,7 @@ module ToJbuilder
       each do |key, value|
         case value
         when Hash
-          if ToJbuilder.model_names.include?(key.to_s.singularize)
-            buffer << "json.#{key} @#{key} do\n"
-          else
-            buffer << "json.#{key} do\n"
-          end
-
+          buffer << "json.#{key} do\n"
           buffer << value.to_jbuilder(key).split("\n").map{|s| "  #{s}\n" }.join
           buffer << "end\n"
         when Array

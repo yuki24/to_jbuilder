@@ -10,9 +10,9 @@ class TestToJbuilder < Minitest::Test
         "updated_at": "2011-10-29T20:45:28-05:00",
 
         "author": {
-          "name": "David H.",
-          "email_address": "'David Heinemeier Hansson' <david@heinemeierhansson.com>",
-          "url": "http://example.com/users/1-david.json"
+          "name": "Yuki Nishijima",
+          "email_address": "'Yuki Nishijima' <mail@yukinishijima.net>",
+          "url": "http://www.yukinishijima.net"
         },
 
         "visitors": 15,
