@@ -1,11 +1,23 @@
 require "to_jbuilder/version"
-require "to_jbuilder/core_ext/array"
-require "to_jbuilder/core_ext/hash"
+require "to_jbuilder/emitter"
 
 require "active_support/concern"
 require 'active_support/core_ext/string/inflections'
 
 module ToJbuilder
+  module CoreExtension
+    prepend_features Array
+    prepend_features Hash
+
+    def to_jbuilder(key)
+      parser = Psych::Parser.new(Psych::JSON::TreeBuilder.new).parse(to_json)
+      io     = StringIO.new(''.encode('utf-8'))
+
+      ToJbuilder::Visitors::Emitter.new(io, key.to_s).accept(parser.handler.root)
+      io.string.tap(&:strip!)
+    end
+  end
+
   def self.model_names
     @model_names ||= if defined?(ActiveRecord::Base)
       ActiveRecord::Base.descendants.map(&:to_s).reject{|d| d.include?("HABTM") }.map(&:underscore)

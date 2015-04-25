@@ -47,9 +47,71 @@ class TestToJbuilder < Minitest::Test
     assert_equal fixture('json_array'), actual
   end
 
+
+  def test_to_jbuilder_converts_a_nested_json_hash_into_jbuilder
+    actual = JSON.parse(<<-JSON_DATA).to_jbuilder(:users)
+      {
+        "writer": {
+          "location": {
+            "current": "New York, US",
+            "hometown": "Tokyo, Japan"
+          },
+          "name": "Yuki Nishijima",
+          "profile": {
+            "gender": "male"
+          }
+        },
+        "post": {
+           "title":       "How does it work?",
+           "description": "I don't know",
+           "tags":        ["Ruby", "JSON"]
+        }
+      }
+    JSON_DATA
+
+    assert_equal fixture('json_nested_hash'), actual
+  end
+
+  def test_to_jbuilder_with_three_nested_hash
+    actual = JSON.parse(<<-JSON_DATA).to_jbuilder(:file_groups)
+      {
+        "albums": [
+          {
+            "id": 85,
+            "name": "My profile photos",
+            "_links": {
+              "self": {
+                "href": "http://example.com/downloads/85"
+              }
+            },
+            "files": [
+              {
+                "id": 181,
+                "aws_object_key": "downloads/yuki24.jpg",
+                "name": "yuki24.jpg",
+                "_links": {
+                  "self": {
+                    "href": "http://example.com/downloads/85/yuki24.jpg"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "_links": {
+          "self": {
+            "href": "http://example.com/downloads"
+          }
+        }
+      }
+    JSON_DATA
+
+    assert_equal fixture('json_three_nested_hash'), actual
+  end
+
   private
 
   def fixture(path)
-    open("#{__dir__}/fixtures/#{path}.jbuilder").read
+    open("#{__dir__}/fixtures/#{path}.jbuilder").read.strip
   end
 end
