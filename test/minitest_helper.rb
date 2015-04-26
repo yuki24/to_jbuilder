@@ -8,3 +8,10 @@ rescue LoadError
 end
 
 require 'minitest/autorun'
+
+begin
+  MiniTest::Test
+rescue NameError
+  require 'minitest/unit'
+  MiniTest::Test = MiniTest::Unit::TestCase
+end
