@@ -13,3 +13,10 @@ rvm:
   - jruby-head
   - rbx-2.4.1
   - rbx-2.5.2
+
+gemfile:
+  - gemfiles/activerecord_32.gemfile
+  - gemfiles/activerecord_40.gemfile
+  - gemfiles/activerecord_41.gemfile
+  - gemfiles/activerecord_42.gemfile
+  - gemfiles/activerecord_edge.gemfile
