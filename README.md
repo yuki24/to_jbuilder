@@ -21,30 +21,30 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
+require 'json'
 require 'to_jbuilder'
 
-# Ruby 2.2 or higher is required to run this code.
 {
-  "content": "<p>This is <i>serious</i> monkey business</p>",
-  "created_at": "2011-10-29T20:45:28-05:00",
-  "updated_at": "2011-10-29T20:45:28-05:00",
+  content: "<p>This is <i>serious</i> monkey business</p>",
+  created_at: "2011-10-29T20:45:28-05:00",
+  updated_at: "2011-10-29T20:45:28-05:00",
 
-  "author": {
-    "name": "Yuki Nishijima",
-    "email_address": "'Yuki Nishijima' <mail@yukinishijima.net>",
-    "url": "http://www.yukinishijima.net"
+  author: {
+    name: "Yuki Nishijima",
+    email_address: "'Yuki Nishijima' <mail@yukinishijima.net>",
+    url: "http://www.yukinishijima.net"
   },
 
-  "visitors": 15,
+  visitors: 15,
 
-  "comments": [
-    { "content": "Hello everyone!", "created_at": "2011-10-29T20:45:28-05:00" },
-    { "content": "To you my good sir!", "created_at": "2011-10-29T20:47:28-05:00" }
+  comments: [
+    { content: "Hello everyone!", created_at: "2011-10-29T20:45:28-05:00" },
+    { content: "To you my good sir!", created_at: "2011-10-29T20:47:28-05:00" }
   ],
 
-  "attachments": [
-    { "filename": "forecast.xls", "url": "http://example.com/downloads/forecast.xls" },
-    { "filename": "presentation.pdf", "url": "http://example.com/downloads/presentation.pdf" }
+  attachments: [
+    { filename: "forecast.xls", url: "http://example.com/downloads/forecast.xls" },
+    { filename: "presentation.pdf", url: "http://example.com/downloads/presentation.pdf" }
   ]
 }.to_jbuilder(:message)
 ```
