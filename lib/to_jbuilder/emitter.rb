@@ -43,13 +43,15 @@ module ToJbuilder
       end
     end
 
-    class Nesting < Struct.new(:name, :type)
+    class Nesting < Struct.new(:name, :type, :sequence_processed)
+      def sequence_processed?
+        !! sequence_processed
+      end
     end
 
     def initialize(io, resource_name)
       @io, @resource_name = io, resource_name
 
-      @sequence_processed = false
       @jbuilder_array     = nil
       @jbuilder_lines     = []
       @nesting            = [Nesting.new(@resource_name, :root)]
@@ -78,11 +80,11 @@ module ToJbuilder
       when ARRAY_START
         flush!
 
-        @io.write "\n" if @trace[-3] != ARRAY_END
-        @io.write @jbuilder_array.to_jbuilder
+        unless @nesting.last.sequence_processed?
+          @io.write "\n" if @trace[-3] != ARRAY_END && @trace[-3] != HASH_START
+          @io.write @jbuilder_array.to_jbuilder
+        end
       when PAIR_KEY
-        return if @sequence_processed
-
         line = @jbuilder_lines.pop
         flush!
         line.line_break = true if @trace[-2] != HASH_START
@@ -95,7 +97,7 @@ module ToJbuilder
 
     def end_mapping
       flush!
-      @sequence_processed = true if within_array? && !@sequence_processed
+      @nesting.last.sequence_processed = true if within_array? && !@nesting.last.sequence_processed?
 
       if @nesting.size > 1 && !within_array?
         @nesting.pop
@@ -116,26 +118,28 @@ module ToJbuilder
         @jbuilder_array = JbuilderArray.new(nil, @nesting.last.name)
       end
 
-      @nesting.push Nesting.new((@jbuilder_array.line || @jbuilder_array).key.singularize, ARRAY_START)
+      @nesting.push Nesting.new((@jbuilder_array.line || @jbuilder_array).key.singularize, ARRAY_START, @nesting.last.sequence_processed)
       @trace << ARRAY_START
     end
 
     def end_sequence
       case @trace.last
+      when ARRAY_START
+        @nesting.pop
+        @jbuilder_lines << @jbuilder_array.line unless @nesting.last.sequence_processed?
       when PAIR_VALUE
         @nesting.pop
         @jbuilder_lines << @jbuilder_array.line
       when HASH_END
         @nesting.pop
-        @io.write "#{indent}end\n"
+        @io.write "#{indent}end\n" unless @nesting.last.sequence_processed?
       end
 
-      @sequence_processed = false
       @trace << ARRAY_END
     end
 
     def scalar(value, anchor, tag, plain, quoted, style)
-      return if @sequence_processed
+      return if @nesting.last.sequence_processed?
 
       case @trace.last
       when DOCUMENT_START, HASH_START, HASH_END, ARRAY_END, PAIR_VALUE
@@ -145,7 +149,7 @@ module ToJbuilder
         @jbuilder_lines << JbuilderLine.new(@nesting.last.name, value, nil, prefix, indent, line_break)
         @trace << PAIR_KEY
       when ARRAY_START
-        @sequence_processed = true
+        @nesting.last.sequence_processed = true
 
         @trace << PAIR_VALUE
       when PAIR_KEY

@@ -109,6 +109,39 @@ class TestToJbuilder < Minitest::Test
     assert_equal fixture('json_three_nested_hash'), actual
   end
 
+  def test_to_jbuilder_with_empty_array
+    actual = JSON.parse(<<-JSON_DATA).to_jbuilder(:user)
+      {
+        "name": "Yuki Nishijima",
+        "tags": [ ],
+        "email_address": "'Yuki Nishijima' <mail@yukinishijima.net>"
+      }
+    JSON_DATA
+
+    assert_equal fixture('json_with_empty_array'), actual
+  end
+
+  def test_to_jbuilder_with_nested_arrays
+    actual = JSON.parse(<<-JSON_DATA).to_jbuilder(:user)
+      [
+        {
+          "tags": [
+            {"foo": "bar", "hoge": "fuga"},
+            {"foo": "bar", "hoge": "fuga"}
+          ]
+        },
+        {
+          "tags": [
+            {"foo": "bar", "hoge": "fuga"},
+            {"foo": "bar", "hoge": "fuga"}
+          ]
+        }
+      ]
+    JSON_DATA
+
+    assert_equal fixture('json_with_nested_arrays'), actual
+  end
+
   private
 
   def fixture(path)
